@@ -1,4 +1,4 @@
-if [ ! -f $BIN_DIR/../conf/env.sh ] 
+if [ ! -f $BIN_DIR/../conf/env.sh ]
 then
   . $BIN_DIR/../conf/env.sh.example
 else
@@ -12,13 +12,13 @@ if [ ! -d "$FLUO_HOME" ]; then
 fi
 FLUO_CMD=$FLUO_HOME/bin/fluo
 if [ -z "$FLUO_APP_NAME" ]; then
-  echo "FLUO_APP_NAME is not set!" 
+  echo "FLUO_APP_NAME is not set!"
   exit 1
 fi
-FLUO_APP_LIB=$FLUO_HOME/apps/$FLUO_APP_NAME/lib
-FLUO_PROPS=$FLUO_HOME/apps/$FLUO_APP_NAME/conf/fluo.properties
+
+FLUO_PROPS=$BIN_DIR/../conf/fluo-conn.properties
 if [ ! -f "$FLUO_PROPS" ] && [ -z "$SKIP_FLUO_PROPS_CHECK" ]; then
-  echo "Fluo properties file not found : $FLUO_PROPS" 
+  echo "Fluo properties file not found : $FLUO_PROPS"
   exit 1
 fi
 
@@ -26,11 +26,11 @@ STRESSO_VERSION=0.0.1-SNAPSHOT
 STRESSO_JAR=$BIN_DIR/../target/stresso-$STRESSO_VERSION.jar
 STRESSO_SHADED_JAR=$BIN_DIR/../target/stresso-$STRESSO_VERSION-shaded.jar
 if [ ! -f "$STRESSO_JAR" ] && [ -z "$SKIP_JAR_CHECKS" ]; then
-  echo "Stresso jar not found : $STRESSO_JAR" 
+  echo "Stresso jar not found : $STRESSO_JAR"
   exit 1;
 fi
 if [ ! -f "$STRESSO_SHADED_JAR" ] && [ -z "$SKIP_JAR_CHECKS" ]; then
-  echo "Stresso shaded jar not found : $STRESSO_SHADED_JAR" 
+  echo "Stresso shaded jar not found : $STRESSO_SHADED_JAR"
   exit 1;
 fi
 

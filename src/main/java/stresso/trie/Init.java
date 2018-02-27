@@ -29,7 +29,7 @@ import org.apache.accumulo.core.client.mapreduce.lib.partition.RangePartitioner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.fluo.api.client.FluoClient;
+import org.apache.fluo.api.client.FluoAdmin;
 import org.apache.fluo.api.client.FluoFactory;
 import org.apache.fluo.api.config.FluoConfiguration;
 import org.apache.fluo.core.util.AccumuloUtil;
@@ -127,20 +127,22 @@ public class Init extends Configured implements Tool {
   @Override
   public int run(String[] args) throws Exception {
     if (args.length != 3) {
-      System.err.println("Usage: " + this.getClass().getSimpleName() + " <fluoProps> <input dir> <tmp dir>");
+      System.err.println("Usage: " + this.getClass().getSimpleName() + " <fluo conn props> <input dir> <tmp dir>");
       System.exit(-1);
     }
 
     FluoConfiguration props = new FluoConfiguration(new File(args[0]));
+    try(FluoAdmin admin = FluoFactory.newAdmin(props)) {
+      // Get the application config stored in zookeeper which has Accumulo connection properties
+      props = new FluoConfiguration(props.orElse(admin.getApplicationConfig()));
+      props.print();
+    }
+
     Path input = new Path(args[1]);
     Path tmp = new Path(args[2]);
 
-    int stopLevel;
-    int nodeSize;
-    try (FluoClient client = FluoFactory.newClient(props)) {
-      nodeSize = client.getAppConfiguration().getInt(Constants.NODE_SIZE_PROP);
-      stopLevel = client.getAppConfiguration().getInt(Constants.STOP_LEVEL_PROP);
-    }
+    int nodeSize = props.getAppConfiguration().getInt(Constants.NODE_SIZE_PROP);
+    int stopLevel = props.getAppConfiguration().getInt(Constants.STOP_LEVEL_PROP);
 
     int ret = unique(input, new Path(tmp, "nums"));
     if (ret != 0)

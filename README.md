@@ -79,6 +79,7 @@ The [bin directory](/bin) contains a set of scripts to help run this test on a
 cluster.  These scripts make the following assumpitions.
 
  * `FLUO_HOME` environment variable is set.  If not set, then set it in `conf/env.sh`.
+ * The [setup.sh](/bin/setup.sh) script assumes `fluo-conn.properties` and `fluo-app.properties` in `$FLUO_HOME/conf` have correct Zookeeper and Accumulo settings.  
  * Hadoop `yarn` command is on path.
  * Hadoop `hadoop` command is on path.
  * Accumulo `accumulo` command is on path.
@@ -86,22 +87,20 @@ cluster.  These scripts make the following assumpitions.
 Before running any of the scipts, copy [conf/env.sh.example](/conf/env.sh.example) 
 to `conf/env.sh`, then inspect and modify the file.
 
-Next, execute the [run-test.sh](/bin/run-test.sh) script.  This script will create a
-new Apache Fluo app called `stresso` (which can be changed by `FLUO_APP_NAME` in your env.sh). 
-It will modify the application's fluo.properties, copy the stresso jar to the `lib/` 
-directory of the app and set the following in fluo.properties:
+ 1. Execute the [setup.sh](/bin/setup.sh) script. This will build Stresso, initialize the Fluo application, and then optimize the Accumulo table.
+ 1. Start the Fluo oracle and workers processes.  TODO link to docs after 1.2.0 is released.  The commands below will start these processes locally.
+    ```
+    fluo oracle -a stresso > oracle.log &
+    fluo worker -a stresso > worker.log &
+    ```
+ 1. Execute the [run-test.sh](/bin/run-test.sh) script.
+ 1. Terminate worker and oracle processes.
 
-```
-fluo.observer.0=stresso.trie.NodeObserver
-fluo.app.trie.nodeSize=X
-fluo.app.trie.stopLevel=Y
-```
-
-The `run-test.sh` script will then initialize and start the Stresso application.  
-It will load a lot of data directly into Accumulo without transactions and then 
+The `run-test.sh` loads a lot of data directly into Accumulo without transactions and then 
 incrementally load smaller amounts of data using transactions.  After incrementally 
 loading some data, it computes the expected number of unique integers using map reduce.
-It then prints the number of unique integers computed by Apache Fluo. 
+It then checks that the number of unique integers compute by Fluo and Map Reduce are the 
+same.
 
 ## Additional Scripts
 

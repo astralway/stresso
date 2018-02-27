@@ -109,7 +109,7 @@ public class Print {
   public static void main(String[] args) throws Exception {
 
     if (args.length != 1) {
-      System.err.println("Usage: " + Print.class.getSimpleName() + " <fluo props>");
+      System.err.println("Usage: " + Print.class.getSimpleName() + " <fluo conn props>");
       System.exit(-1);
     }
 

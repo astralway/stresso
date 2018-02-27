@@ -3,7 +3,7 @@ package stresso.trie;
 import java.io.File;
 
 import org.apache.accumulo.core.client.Connector;
-import org.apache.fluo.api.client.FluoClient;
+import org.apache.fluo.api.client.FluoAdmin;
 import org.apache.fluo.api.client.FluoFactory;
 import org.apache.fluo.api.config.FluoConfiguration;
 import org.apache.fluo.core.util.AccumuloUtil;
@@ -20,23 +20,24 @@ public class CompactLL {
 
     if (args.length != 3) {
       System.err
-          .println("Usage: " + Split.class.getSimpleName() + " <fluo props> <max> <cutoff>");
+          .println("Usage: " + Split.class.getSimpleName() + " <fluo conn props> <max> <cutoff>");
       System.exit(-1);
     }
 
     FluoConfiguration config = new FluoConfiguration(new File(args[0]));
+
+    try(FluoAdmin admin = FluoFactory.newAdmin(config)) {
+      // Get the application config stored in zookeeper which has Accumulo connection properties
+      config = new FluoConfiguration(config.orElse(admin.getApplicationConfig()));
+    }
 
     long max = Long.parseLong(args[1]);
 
     //compact levels that can contain less nodes than this
     int cutoff = Integer.parseInt(args[2]);
 
-    int nodeSize;
-    int stopLevel;
-    try (FluoClient client = FluoFactory.newClient(config)) {
-      nodeSize = client.getAppConfiguration().getInt(Constants.NODE_SIZE_PROP);
-      stopLevel = client.getAppConfiguration().getInt(Constants.STOP_LEVEL_PROP);
-    }
+    int nodeSize = config.getAppConfiguration().getInt(Constants.NODE_SIZE_PROP);
+    int stopLevel = config.getAppConfiguration().getInt(Constants.STOP_LEVEL_PROP);
 
     int level = 64 / nodeSize;
 

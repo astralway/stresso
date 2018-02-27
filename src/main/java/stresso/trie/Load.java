@@ -49,7 +49,7 @@ public class Load extends Configured implements Tool {
   public int run(String[] args) throws Exception {
 
     if (args.length != 2) {
-      log.error("Usage: " + this.getClass().getSimpleName() + "<fluoProps> <input dir>");
+      log.error("Usage: " + this.getClass().getSimpleName() + "<fluo conn props> <input dir>");
       System.exit(-1);
     }
 

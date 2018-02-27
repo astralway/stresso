@@ -53,7 +53,7 @@ public class Diff {
   public static void main(String[] args) throws Exception {
 
     if (args.length != 1) {
-      System.err.println("Usage: " + Diff.class.getSimpleName() + " <fluo props>");
+      System.err.println("Usage: " + Diff.class.getSimpleName() + " <fluo conn props>");
       System.exit(-1);
     }
 
